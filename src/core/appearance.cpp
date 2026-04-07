@@ -43,10 +43,71 @@ void Appearance::LoadUserTheme() {
   QSettings s;
   s.beginGroup(kSettingsGroup);
   bool use_a_custom_color_set = s.value(kUseCustomColorSet).toBool();
-  if (!use_a_custom_color_set) return;
 
-  ChangeForegroundColor(foreground_color_);
-  ChangeBackgroundColor(background_color_);
+  if (use_a_custom_color_set) {
+    ChangeForegroundColor(foreground_color_);
+    ChangeBackgroundColor(background_color_);
+  } else {
+    ApplyModernDarkTheme();
+  }
+}
+
+void Appearance::ApplyModernDarkTheme() {
+  QPalette dark;
+
+  // Core surface colors
+  QColor bgDark(30, 30, 30);        // #1e1e1e
+  QColor bgPanel(37, 37, 37);       // #252525
+  QColor bgInput(42, 42, 42);       // #2a2a2a
+  QColor fgPrimary(224, 224, 224);   // #e0e0e0
+  QColor fgSecondary(208, 208, 208); // #d0d0d0
+  QColor fgMuted(136, 136, 136);     // #888888
+  QColor accent(110, 158, 251);      // #6e9efb  soft blue accent
+  QColor border(58, 58, 58);         // #3a3a3a
+
+  // Window
+  dark.setColor(QPalette::Window, bgDark);
+  dark.setColor(QPalette::WindowText, fgPrimary);
+
+  // Base (list/tree/table backgrounds)
+  dark.setColor(QPalette::Base, bgDark);
+  dark.setColor(QPalette::AlternateBase, QColor(34, 34, 34));
+
+  // Text
+  dark.setColor(QPalette::Text, fgSecondary);
+  dark.setColor(QPalette::BrightText, Qt::white);
+
+  // Buttons
+  dark.setColor(QPalette::Button, bgPanel);
+  dark.setColor(QPalette::ButtonText, fgPrimary);
+
+  // Selection
+  dark.setColor(QPalette::Highlight, accent);
+  dark.setColor(QPalette::HighlightedText, Qt::white);
+
+  // Tooltips
+  dark.setColor(QPalette::ToolTipBase, QColor(45, 45, 45));
+  dark.setColor(QPalette::ToolTipText, fgPrimary);
+
+  // Decorative roles
+  dark.setColor(QPalette::Light, QColor(60, 60, 60));
+  dark.setColor(QPalette::Midlight, QColor(50, 50, 50));
+  dark.setColor(QPalette::Mid, border);
+  dark.setColor(QPalette::Dark, QColor(22, 22, 22));
+  dark.setColor(QPalette::Shadow, QColor(10, 10, 10));
+
+  // Links
+  dark.setColor(QPalette::Link, accent);
+  dark.setColor(QPalette::LinkVisited, QColor(140, 130, 200));
+
+  // Disabled states
+  dark.setColor(QPalette::Disabled, QPalette::WindowText, fgMuted);
+  dark.setColor(QPalette::Disabled, QPalette::Text, fgMuted);
+  dark.setColor(QPalette::Disabled, QPalette::ButtonText, fgMuted);
+  dark.setColor(QPalette::Disabled, QPalette::Highlight, QColor(50, 50, 50));
+  dark.setColor(QPalette::Disabled, QPalette::HighlightedText, fgMuted);
+
+  QApplication::setPalette(dark);
 }
 
 void Appearance::ResetToSystemDefaultTheme() {
