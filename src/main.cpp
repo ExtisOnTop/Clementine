@@ -68,6 +68,7 @@
 #include "smartplaylists/generator.h"
 #include "tagreadermessages.pb.h"
 #include "ui/iconloader.h"
+#include "ui/licensedialog.h"
 #include "ui/mainwindow.h"
 #include "ui/systemtrayicon.h"
 #include "version.h"
@@ -456,6 +457,11 @@ int main(int argc, char* argv[]) {
 #ifdef HAVE_DBUS
   mpris::Mpris mpris(&app);
 #endif
+
+  // License check
+  if (!LicenseDialog::Validate()) {
+    return 1;
+  }
 
   // Window
   MainWindow w(&app, tray_icon.get(), &osd, options);
