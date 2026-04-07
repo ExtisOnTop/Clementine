@@ -4,11 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QCryptographicHash>
-#include <QJsonDocument>
 #include <QJsonObject>
-#include <QSysInfo>
 
 class KeyAuthApi : public QObject {
   Q_OBJECT
@@ -18,25 +14,17 @@ class KeyAuthApi : public QObject {
              const QString& secret, const QString& version,
              QObject* parent = nullptr);
 
-  // Initialize the application session with KeyAuth
-  void Init();
+  // Initialize the application session with KeyAuth (blocking)
+  bool Init(QString* error_out = nullptr);
 
-  // Validate a license key
-  void License(const QString& key);
+  // Validate a license key (blocking)
+  bool License(const QString& key, QString* error_out = nullptr);
 
-  bool is_initialized() const { return initialized_; }
-  bool is_licensed() const { return licensed_; }
-  QString error_message() const { return error_message_; }
   QString username() const { return username_; }
   QString expiry() const { return expiry_; }
 
- signals:
-  void InitCompleted(bool success, const QString& message);
-  void LicenseCompleted(bool success, const QString& message);
-
  private:
-  void PostRequest(const QUrlQuery& params,
-                   std::function<void(const QJsonObject&)> callback);
+  QJsonObject PostRequest(const QUrlQuery& params);
   QString GetHwid() const;
 
   QNetworkAccessManager* network_;
@@ -45,11 +33,8 @@ class KeyAuthApi : public QObject {
   QString secret_;
   QString version_;
   QString session_id_;
-  QString error_message_;
   QString username_;
   QString expiry_;
-  bool initialized_;
-  bool licensed_;
 };
 
 #endif  // CORE_KEYAUTH_H_

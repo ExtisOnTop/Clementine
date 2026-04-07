@@ -19,8 +19,6 @@ class LicenseDialog : public QDialog {
 
  private slots:
   void OnActivateClicked();
-  void OnInitCompleted(bool success, const QString& message);
-  void OnLicenseCompleted(bool success, const QString& message);
 
  private:
   void SetStatus(const QString& text, bool is_error = false);
@@ -29,7 +27,6 @@ class LicenseDialog : public QDialog {
   QLineEdit* key_input_;
   QPushButton* activate_button_;
   QLabel* status_label_;
-  QLabel* title_label_;
 };
 
 #endif  // UI_LICENSEDIALOG_H_

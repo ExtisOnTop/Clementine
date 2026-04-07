@@ -1,10 +1,10 @@
 #include "licensedialog.h"
 
 #include <QApplication>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFont>
 #include <QSettings>
+#include <QTimer>
 
 #include "core/keyauth.h"
 
@@ -22,62 +22,40 @@ LicenseDialog::LicenseDialog(QWidget* parent)
       api_(new KeyAuthApi(kKeyAuthAppName, kKeyAuthOwnerId, kKeyAuthSecret,
                           kKeyAuthVersion, this)) {
   setWindowTitle("Clementine - License Activation");
-  setFixedSize(420, 260);
+  setFixedSize(420, 280);
   setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-  // Styling
   setStyleSheet(
-      "QDialog {"
-      "  background-color: #1e1e1e;"
-      "}"
-      "QLabel {"
-      "  color: #e0e0e0;"
-      "  background: transparent;"
-      "}"
+      "QDialog { background-color: #1e1e1e; }"
+      "QLabel { color: #e0e0e0; background: transparent; }"
       "QLineEdit {"
-      "  background-color: #2a2a2a;"
-      "  color: #e0e0e0;"
-      "  border: 1px solid #3a3a3a;"
-      "  border-radius: 8px;"
-      "  padding: 10px 14px;"
-      "  font-size: 13px;"
+      "  background-color: #2a2a2a; color: #e0e0e0;"
+      "  border: 1px solid #3a3a3a; border-radius: 8px;"
+      "  padding: 10px 14px; font-size: 13px;"
       "}"
-      "QLineEdit:focus {"
-      "  border: 1px solid #6e9efb;"
-      "}"
+      "QLineEdit:focus { border: 1px solid #6e9efb; }"
       "QPushButton {"
-      "  background-color: #6e9efb;"
-      "  color: #ffffff;"
-      "  border: none;"
-      "  border-radius: 8px;"
-      "  padding: 10px 24px;"
-      "  font-size: 13px;"
-      "  font-weight: 600;"
+      "  background-color: #6e9efb; color: #ffffff;"
+      "  border: none; border-radius: 8px;"
+      "  padding: 10px 24px; font-size: 13px; font-weight: 600;"
       "}"
-      "QPushButton:hover {"
-      "  background-color: #85adfb;"
-      "}"
-      "QPushButton:pressed {"
-      "  background-color: #5a8ae6;"
-      "}"
-      "QPushButton:disabled {"
-      "  background-color: #333333;"
-      "  color: #666666;"
-      "}");
+      "QPushButton:hover { background-color: #85adfb; }"
+      "QPushButton:pressed { background-color: #5a8ae6; }"
+      "QPushButton:disabled { background-color: #333333; color: #666666; }");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(32, 28, 32, 28);
   layout->setSpacing(16);
 
   // Title
-  title_label_ = new QLabel("Enter License Key");
-  QFont title_font = title_label_->font();
+  QLabel* title = new QLabel("Enter License Key");
+  QFont title_font = title->font();
   title_font.setPointSize(16);
   title_font.setWeight(QFont::DemiBold);
-  title_label_->setFont(title_font);
-  title_label_->setStyleSheet("color: #ffffff;");
-  title_label_->setAlignment(Qt::AlignCenter);
-  layout->addWidget(title_label_);
+  title->setFont(title_font);
+  title->setStyleSheet("color: #ffffff;");
+  title->setAlignment(Qt::AlignCenter);
+  layout->addWidget(title);
 
   // Subtitle
   QLabel* subtitle = new QLabel("Enter your license key to activate Clementine");
@@ -102,20 +80,15 @@ LicenseDialog::LicenseDialog(QWidget* parent)
   status_label_ = new QLabel();
   status_label_->setAlignment(Qt::AlignCenter);
   status_label_->setWordWrap(true);
-  status_label_->setStyleSheet("font-size: 11px;");
+  status_label_->setStyleSheet("font-size: 11px; color: #888888;");
   layout->addWidget(status_label_);
 
   layout->addStretch();
 
-  // Connections
   connect(activate_button_, &QPushButton::clicked, this,
           &LicenseDialog::OnActivateClicked);
   connect(key_input_, &QLineEdit::returnPressed, this,
           &LicenseDialog::OnActivateClicked);
-  connect(api_, &KeyAuthApi::InitCompleted, this,
-          &LicenseDialog::OnInitCompleted);
-  connect(api_, &KeyAuthApi::LicenseCompleted, this,
-          &LicenseDialog::OnLicenseCompleted);
 
   // Load saved key
   QSettings s;
@@ -136,37 +109,39 @@ void LicenseDialog::OnActivateClicked() {
   activate_button_->setEnabled(false);
   activate_button_->setText("Connecting...");
   SetStatus("Initializing...");
+  QApplication::processEvents();
 
-  api_->Init();
-}
-
-void LicenseDialog::OnInitCompleted(bool success, const QString& message) {
-  if (!success) {
-    SetStatus("Connection failed: " + message, true);
+  // Step 1: Init
+  QString error;
+  if (!api_->Init(&error)) {
+    SetStatus("Connection failed: " + error, true);
     activate_button_->setEnabled(true);
     activate_button_->setText("Activate");
     return;
   }
 
+  // Step 2: Validate license
   activate_button_->setText("Validating...");
   SetStatus("Checking license...");
-  api_->License(key_input_->text().trimmed());
-}
+  QApplication::processEvents();
 
-void LicenseDialog::OnLicenseCompleted(bool success, const QString& message) {
-  if (success) {
-    // Save the key for next launch
-    QSettings s;
-    s.beginGroup(kSettingsGroup);
-    s.setValue(kSettingsKey, key_input_->text().trimmed());
-
-    SetStatus("License activated successfully!");
-    accept();
-  } else {
-    SetStatus("Invalid license: " + message, true);
+  if (!api_->License(key, &error)) {
+    SetStatus("Invalid license: " + error, true);
     activate_button_->setEnabled(true);
     activate_button_->setText("Activate");
+    return;
   }
+
+  // Success - save key and close
+  QSettings s;
+  s.beginGroup(kSettingsGroup);
+  s.setValue(kSettingsKey, key);
+
+  SetStatus("License activated successfully!");
+  QApplication::processEvents();
+
+  // Small delay so user sees the success message
+  QTimer::singleShot(500, this, &QDialog::accept);
 }
 
 void LicenseDialog::SetStatus(const QString& text, bool is_error) {

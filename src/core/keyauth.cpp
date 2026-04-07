@@ -6,8 +6,8 @@
 #include <QJsonObject>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSysInfo>
 #include <QUrlQuery>
-#include <QUuid>
 
 KeyAuthApi::KeyAuthApi(const QString& name, const QString& ownerid,
                        const QString& secret, const QString& version,
@@ -17,9 +17,7 @@ KeyAuthApi::KeyAuthApi(const QString& name, const QString& ownerid,
       name_(name),
       ownerid_(ownerid),
       secret_(secret),
-      version_(version),
-      initialized_(false),
-      licensed_(false) {}
+      version_(version) {}
 
 QString KeyAuthApi::GetHwid() const {
   return QSysInfo::machineUniqueId().isEmpty()
@@ -27,9 +25,7 @@ QString KeyAuthApi::GetHwid() const {
              : QString::fromUtf8(QSysInfo::machineUniqueId());
 }
 
-void KeyAuthApi::PostRequest(
-    const QUrlQuery& params,
-    std::function<void(const QJsonObject&)> callback) {
+QJsonObject KeyAuthApi::PostRequest(const QUrlQuery& params) {
   QNetworkRequest request;
   request.setUrl(QUrl("https://keyauth.win/api/1.3/"));
   request.setHeader(QNetworkRequest::ContentTypeHeader,
@@ -41,46 +37,48 @@ void KeyAuthApi::PostRequest(
   connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
   loop.exec();
 
+  QJsonObject result;
   if (reply->error() != QNetworkReply::NoError) {
-    QJsonObject err;
-    err["success"] = false;
-    err["message"] = reply->errorString();
-    callback(err);
+    result["success"] = false;
+    result["message"] = reply->errorString();
   } else {
     QByteArray data = reply->readAll();
     QJsonDocument doc = QJsonDocument::fromJson(data);
-    callback(doc.object());
+    if (doc.isObject()) {
+      result = doc.object();
+    } else {
+      result["success"] = false;
+      result["message"] = QString("Invalid response from server");
+    }
   }
 
   reply->deleteLater();
+  return result;
 }
 
-void KeyAuthApi::Init() {
+bool KeyAuthApi::Init(QString* error_out) {
   QUrlQuery params;
   params.addQueryItem("type", "init");
   params.addQueryItem("name", name_);
   params.addQueryItem("ownerid", ownerid_);
   params.addQueryItem("ver", version_);
 
-  PostRequest(params, [this](const QJsonObject& response) {
-    bool success = response["success"].toBool();
-    QString message = response["message"].toString();
+  QJsonObject response = PostRequest(params);
+  bool success = response["success"].toBool();
 
-    if (success) {
-      session_id_ = response["sessionid"].toString();
-      initialized_ = true;
-    }
+  if (success) {
+    session_id_ = response["sessionid"].toString();
+  } else if (error_out) {
+    *error_out = response["message"].toString();
+  }
 
-    error_message_ = success ? "" : message;
-    emit InitCompleted(success, message);
-  });
+  return success;
 }
 
-void KeyAuthApi::License(const QString& key) {
-  if (!initialized_) {
-    error_message_ = "Not initialized";
-    emit LicenseCompleted(false, error_message_);
-    return;
+bool KeyAuthApi::License(const QString& key, QString* error_out) {
+  if (session_id_.isEmpty()) {
+    if (error_out) *error_out = "Not initialized";
+    return false;
   }
 
   QUrlQuery params;
@@ -91,22 +89,20 @@ void KeyAuthApi::License(const QString& key) {
   params.addQueryItem("name", name_);
   params.addQueryItem("ownerid", ownerid_);
 
-  PostRequest(params, [this](const QJsonObject& response) {
-    bool success = response["success"].toBool();
-    QString message = response["message"].toString();
+  QJsonObject response = PostRequest(params);
+  bool success = response["success"].toBool();
 
-    if (success) {
-      licensed_ = true;
-      QJsonObject info = response["info"].toObject();
-      username_ = info["username"].toString();
+  if (success) {
+    QJsonObject info = response["info"].toObject();
+    username_ = info["username"].toString();
 
-      QJsonArray subs = info["subscriptions"].toArray();
-      if (!subs.isEmpty()) {
-        expiry_ = subs[0].toObject()["expiry"].toString();
-      }
+    QJsonArray subs = info["subscriptions"].toArray();
+    if (!subs.isEmpty()) {
+      expiry_ = subs[0].toObject()["expiry"].toString();
     }
+  } else if (error_out) {
+    *error_out = response["message"].toString();
+  }
 
-    error_message_ = success ? "" : message;
-    emit LicenseCompleted(success, message);
-  });
+  return success;
 }
