@@ -463,6 +463,13 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  // Force window to show after license validation
+  QSettings main_settings;
+  main_settings.beginGroup(MainWindow::kSettingsGroup);
+  main_settings.setValue("startupbehaviour", 1);  // AlwaysShow
+  main_settings.setValue("hidden", false);
+  main_settings.endGroup();
+
   // Window
   MainWindow w(&app, tray_icon.get(), &osd, options);
 #ifdef Q_OS_DARWIN

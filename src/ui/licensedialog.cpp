@@ -153,5 +153,9 @@ void LicenseDialog::SetStatus(const QString& text, bool is_error) {
 
 bool LicenseDialog::Validate(QWidget* parent) {
   LicenseDialog dialog(parent);
+  dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
+  dialog.show();
+  dialog.raise();
+  dialog.activateWindow();
   return dialog.exec() == QDialog::Accepted;
 }
