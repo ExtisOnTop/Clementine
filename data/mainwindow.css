@@ -5,10 +5,8 @@
    ========================================================================== */
 
 /* --- Global defaults --- */
-
-* {
-  font-family: "Segoe UI", "Helvetica Neue", "SF Pro Display", sans-serif;
-}
+/* Base colors come from QPalette set in Appearance::ApplyModernDarkTheme() */
+/* Do NOT set QWidget or * background here - causes stack overflow */
 
 darwin {
   font-size: 11pt;
@@ -18,15 +16,10 @@ darwin QMenu {
   font-size: 13pt;
 }
 
-/* --- Main window & panels --- */
+/* --- Main window --- */
 
 QMainWindow {
   background-color: #1e1e1e;
-}
-
-QWidget {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
 }
 
 /* --- Toolbar --- */
@@ -551,11 +544,7 @@ QGroupBox::title {
 }
 
 /* --- Dialogs / settings --- */
-
-QDialog {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-}
+/* QDialog colors come from QPalette */
 
 /* --- Status bar --- */
 
@@ -598,24 +587,12 @@ QToolTip {
   font-size: 12px;
 }
 
-/* --- Frames & dock widgets --- */
-
-QFrame {
-  border-color: #333333;
-}
-
-QDockWidget {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  titlebar-close-icon: none;
-  titlebar-normal-icon: none;
-}
+/* --- Dock widgets --- */
 
 QDockWidget::title {
   background-color: #252525;
   padding: 8px;
   border-bottom: 1px solid #333333;
-  font-weight: 600;
 }
 
 /* --- Text edits --- */
@@ -630,31 +607,10 @@ QTextEdit, QPlainTextEdit {
 }
 
 /* --- Labels --- */
-
-QLabel {
-  color: #d0d0d0;
-  background-color: transparent;
-}
-
-QLabel:disabled {
-  color: #555555;
-}
-
-/* --- Stacked widget pages --- */
-
-QStackedWidget {
-  background-color: #1e1e1e;
-}
+/* QLabel colors come from QPalette */
 
 /* --- Scroll area --- */
 
 QScrollArea {
-  background-color: #1e1e1e;
   border: none;
-}
-
-/* --- Tab widget for settings dialog --- */
-
-QTabWidget > QWidget {
-  background-color: #1e1e1e;
 }
