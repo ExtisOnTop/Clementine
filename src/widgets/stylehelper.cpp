@@ -102,9 +102,17 @@ QColor StyleHelper::borderColor(bool lightColored) {
 void StyleHelper::setBaseColor(const QColor& newcolor) {
   m_requestedBaseColor = newcolor;
 
+  // For dark themes, use a dark neutral base rather than
+  // deriving from the highlight color (which produces brown/tinted sidebars)
   QColor color;
-  color.setHsv(newcolor.hue(), newcolor.saturation() * 0.7,
-               64 + newcolor.value() / 3);
+  int value = newcolor.value();
+  if (value < 128) {
+    // Already dark - use a clean dark gray
+    color.setHsv(0, 0, 42);
+  } else {
+    color.setHsv(newcolor.hue(), newcolor.saturation() * 0.7,
+                 64 + newcolor.value() / 3);
+  }
 
   if (color.isValid() && color != m_baseColor) {
     m_baseColor = color;

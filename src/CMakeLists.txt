@@ -72,6 +72,7 @@ set(SOURCES
 
   core/appearance.cpp
   core/application.cpp
+  core/keyauth.cpp
   core/backgroundstreams.cpp
   core/commandlineoptions.cpp
   core/crashreporting.cpp
@@ -357,6 +358,7 @@ set(SOURCES
   ui/globalshortcutgrabber.cpp
   ui/globalshortcutssettingspage.cpp
   ui/iconloader.cpp
+  ui/licensedialog.cpp
   ui/mainwindow.cpp
   ui/networkproxysettingspage.cpp
   ui/networkremotesettingspage.cpp
@@ -427,6 +429,7 @@ set(HEADERS
 
   core/application.h
   core/backgroundstreams.h
+  core/keyauth.h
   core/crashreporting.h
   core/database.h
   core/deletefiles.h
@@ -658,6 +661,7 @@ set(HEADERS
   ui/equalizer.h
   ui/globalshortcutgrabber.h
   ui/globalshortcutssettingspage.h
+  ui/licensedialog.h
   ui/mainwindow.h
   ui/networkproxysettingspage.h
   ui/networkremotesettingspage.h

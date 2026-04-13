@@ -1,3 +1,9 @@
+/* Clementine Modern Dark Theme - Safe stylesheet
+   Heavy styling is done via QPalette in Appearance::ApplyModernDarkTheme().
+   This file only styles specific widgets that need CSS beyond palette colors.
+   IMPORTANT: Do not use broad selectors (QWidget, QLabel, QDialog, QFrame)
+   as they trigger infinite PaletteChange loops via StyleSheetLoader. */
+
 darwin {
   font-size: 11pt;
 }
@@ -6,10 +12,11 @@ darwin QMenu {
   font-size: 13pt;
 }
 
+/* --- Playlist --- */
+
 #playlist {
   background-color: %palette-base;
   alternate-background-color: %palette-alternate-base;
-
 }
 
 #playlist[default_background_enabled = "true"] {
@@ -20,10 +27,12 @@ darwin QMenu {
   background-clip: content;
 }
 
+/* --- Toolbar buttons --- */
+
 QToolButton {
   border: 2px solid transparent;
-  border-radius: 3px;
-  padding: 1px;
+  border-radius: 5px;
+  padding: 3px;
 }
 
 QToolButton::menu-button {
@@ -36,19 +45,137 @@ QToolButton[popupMode="1"] {
 }
 
 QToolButton:hover {
-  border: 2px solid %palette-highlight;
-  background-color: %palette-highlight-lighter;
-}
-
-QToolButton:hover[popupMode="1"] {
-  padding-right: 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.10);
 }
 
 QToolButton:pressed {
-  border: 2px solid %palette-highlight-darker;
-  background-color: %palette-highlight-lighter;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.14);
 }
 
-QToolButton:pressed[popupMode="1"] {
-  padding-right: 16px;
+/* --- Scrollbars --- */
+
+QScrollBar:vertical {
+  background-color: transparent;
+  width: 8px;
+  margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  min-height: 30px;
+}
+
+QScrollBar::handle:vertical:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+  background: none;
+  border: none;
+  height: 0px;
+}
+
+QScrollBar:horizontal {
+  background-color: transparent;
+  height: 8px;
+  margin: 0px;
+}
+
+QScrollBar::handle:horizontal {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  min-width: 30px;
+}
+
+QScrollBar::handle:horizontal:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal,
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+  background: none;
+  border: none;
+  width: 0px;
+}
+
+/* --- Sliders --- */
+
+QSlider::groove:horizontal {
+  height: 4px;
+  background-color: #3a3a3a;
+  border-radius: 2px;
+}
+
+QSlider::handle:horizontal {
+  background-color: #e0e0e0;
+  width: 12px;
+  height: 12px;
+  margin: -4px 0;
+  border-radius: 6px;
+}
+
+QSlider::handle:horizontal:hover {
+  background-color: #ffffff;
+}
+
+QSlider::sub-page:horizontal {
+  background-color: #6e9efb;
+  border-radius: 2px;
+}
+
+/* --- Header view (column headers in playlist) --- */
+
+QHeaderView::section {
+  background-color: #252525;
+  color: #888888;
+  padding: 5px 8px;
+  border: none;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+}
+
+/* --- Menus --- */
+
+QMenu {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  padding: 4px 0px;
+}
+
+QMenu::item {
+  padding: 6px 24px 6px 16px;
+}
+
+QMenu::item:selected {
+  background-color: rgba(255, 255, 255, 0.10);
+}
+
+QMenu::separator {
+  height: 1px;
+  background-color: #3a3a3a;
+  margin: 4px 8px;
+}
+
+/* --- Status bar --- */
+
+QStatusBar {
+  background-color: #1a1a1a;
+  border-top: 1px solid #2a2a2a;
+}
+
+QStatusBar::item {
+  border: none;
+}
+
+/* --- Tooltips --- */
+
+QToolTip {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #444444;
+  padding: 4px 8px;
 }

@@ -30,6 +30,7 @@ class Appearance : public QObject {
   // custom set of colors that user has chosen
   void LoadUserTheme();
   void ResetToSystemDefaultTheme();
+  void ApplyModernDarkTheme();
   void ChangeForegroundColor(const QColor& color);
   void ChangeBackgroundColor(const QColor& color);
 

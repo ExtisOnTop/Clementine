@@ -46,20 +46,20 @@ const char* NowPlayingWidget::kSettingsGroup = "NowPlayingWidget";
 const char* NowPlayingWidget::kHypnotoadPath = ":/hypnotoad.gif";
 
 // Space between the cover and the details in small mode
-const int NowPlayingWidget::kPadding = 2;
+const int NowPlayingWidget::kPadding = 6;
 
-// Width of the transparent to black gradient above and below the text in large
+// Width of the transparent to dark gradient above and below the text in large
 // mode
-const int NowPlayingWidget::kGradientHead = 40;
-const int NowPlayingWidget::kGradientTail = 20;
+const int NowPlayingWidget::kGradientHead = 50;
+const int NowPlayingWidget::kGradientTail = 25;
 
 // Maximum height of the cover in large mode, and offset between the
 // bottom of the cover and bottom of the widget
-const int NowPlayingWidget::kMaxCoverSize = 260;
+const int NowPlayingWidget::kMaxCoverSize = 280;
 const int NowPlayingWidget::kBottomOffset = 0;
 
 // Border for large mode
-const int NowPlayingWidget::kTopBorder = 4;
+const int NowPlayingWidget::kTopBorder = 0;
 
 NowPlayingWidget::NowPlayingWidget(QWidget* parent)
     : QWidget(parent),
@@ -161,7 +161,8 @@ NowPlayingWidget::NowPlayingWidget(QWidget* parent)
     details_->setDefaultStyleSheet(
         "p {"
         "  font-size: small;"
-        "  color: white;"
+        "  color: #e0e0e0;"
+        "  line-height: 1.4;"
         "}");
     details_->setHtml(QString("<p align=center><i></i><br/><br/></p>"));
   }
@@ -261,7 +262,12 @@ void NowPlayingWidget::UpdateDetailsText() {
       details_->setDefaultStyleSheet(
           "p {"
           "  font-size: small;"
-          "  color: white;"
+          "  color: #e0e0e0;"
+          "  line-height: 1.4;"
+          "}"
+          "i {"
+          "  color: #ffffff;"
+          "  font-weight: 500;"
           "}");
       html += "<p align=center>";
       break;
@@ -272,12 +278,23 @@ void NowPlayingWidget::UpdateDetailsText() {
         details_->setDefaultStyleSheet(
             "p {"
             "  font-size: small;"
+            "  color: #d0d0d0;"
+            "  line-height: 1.4;"
+            "}"
+            "i {"
+            "  color: #ffffff;"
+            "  font-weight: 500;"
             "}");
       } else {
         details_->setDefaultStyleSheet(
             "p {"
             "  font-size: small;"
-            "  color: white;"
+            "  color: #e0e0e0;"
+            "  line-height: 1.4;"
+            "}"
+            "i {"
+            "  color: #ffffff;"
+            "  font-weight: 500;"
             "}");
       }
       html += "<p align=center>";
@@ -401,9 +418,9 @@ void NowPlayingWidget::DrawContents(QPainter* p) {
       const int x_offset =
           (width() - cover_loader_options_.desired_height_) / 2;
 
-      // Draw the black background
+      // Draw the dark background
       p->fillRect(QRect(0, kTopBorder, width(), height() - kTopBorder),
-                  Qt::black);
+                  QColor(26, 26, 26));
 
       // Draw the cover
       if (hypnotoad_) {
@@ -421,11 +438,11 @@ void NowPlayingWidget::DrawContents(QPainter* p) {
       const int text_height = details_->size().height();
       const int gradient_mid = height() - qMax(text_height, kBottomOffset);
 
-      // Draw the black fade
+      // Draw the dark fade
       QLinearGradient gradient(0, gradient_mid - kGradientHead, 0,
                                gradient_mid + kGradientTail);
-      gradient.setColorAt(0, QColor(0, 0, 0, 0));
-      gradient.setColorAt(1, QColor(0, 0, 0, 255));
+      gradient.setColorAt(0, QColor(26, 26, 26, 0));
+      gradient.setColorAt(1, QColor(26, 26, 26, 240));
 
       p->fillRect(0, gradient_mid - kGradientHead, width(),
                   height() - (gradient_mid - kGradientHead), gradient);
@@ -443,9 +460,9 @@ void NowPlayingWidget::DrawContents(QPainter* p) {
       const int x_offset =
           (width() - cover_loader_options_.desired_height_) / 2;
 
-      // Draw the black background
+      // Draw the dark background
       p->fillRect(QRect(0, kTopBorder, width(), height() - kTopBorder),
-                  Qt::black);
+                  QColor(26, 26, 26));
 
       // Draw the cover
       if (hypnotoad_) {
@@ -471,9 +488,9 @@ void NowPlayingWidget::DrawContents(QPainter* p) {
           (width() - cover_loader_options_.desired_height_) / 2;
 
       if (!fit_width_) {
-        // Draw the black background
+        // Draw the dark background
         p->fillRect(QRect(0, kTopBorder, width(), height() - kTopBorder),
-                    Qt::black);
+                    QColor(26, 26, 26));
       }
 
       // Draw the cover

@@ -1,7 +1,10 @@
 QScrollArea {
-  background: qpalette(base);
+  background: #1e1e1e;
+  border: none;
 }
 
 QTextEdit {
-  border: 0px;
+  border: none;
+  background: #1e1e1e;
+  color: #d0d0d0;
 }

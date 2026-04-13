@@ -17,6 +17,7 @@
 
 #include "gstelementdeleter.h"
 
+#include <QtConcurrentRun>
 #include <QtDebug>
 
 GstElementDeleter::GstElementDeleter(QObject* parent) : QObject(parent) {}
@@ -27,5 +28,12 @@ void GstElementDeleter::DeleteElementLater(GstElement* element) {
 }
 
 void GstElementDeleter::DeleteElement(GstElement* element) {
-  gst_element_set_state(element, GST_STATE_NULL);
+  // Setting state to NULL waits for internal streaming threads to stop, which
+  // can block for several seconds.  Run it in a background thread so the main
+  // thread stays responsive during track transitions.
+  gst_object_ref(element);
+  QtConcurrent::run([element]() {
+    gst_element_set_state(element, GST_STATE_NULL);
+    gst_object_unref(element);
+  });
 }

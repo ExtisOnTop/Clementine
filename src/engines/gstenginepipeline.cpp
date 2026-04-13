@@ -1127,9 +1127,19 @@ void GstEnginePipeline::TransitionToNext() {
 }
 
 qint64 GstEnginePipeline::position() const {
-  if (pipeline_is_initialised_)
-    gst_element_query_position(pipeline_, GST_FORMAT_TIME,
-                               &last_known_position_ns_);
+  if (pipeline_is_initialised_) {
+    // Only query position when the pipeline is in a stable state.
+    // gst_element_query_position can block if the pipeline is transitioning
+    // states (e.g. during a track change), which would freeze the main thread.
+    GstState state = GST_STATE_NULL, pending = GST_STATE_NULL;
+    GstStateChangeReturn ret =
+        gst_element_get_state(pipeline_, &state, &pending, 0 /* non-blocking */);
+    if (ret != GST_STATE_CHANGE_ASYNC &&
+        (state == GST_STATE_PLAYING || state == GST_STATE_PAUSED)) {
+      gst_element_query_position(pipeline_, GST_FORMAT_TIME,
+                                 &last_known_position_ns_);
+    }
+  }
 
   return last_known_position_ns_;
 }

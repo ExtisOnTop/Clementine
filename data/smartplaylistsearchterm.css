@@ -1,43 +1,31 @@
 #frame {
-  border: 1px solid palette(mid);
-  border-radius: 5px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background-color: #252525;
 }
 
 #container {
-  margin: 2px;
+  margin: 3px;
 }
 
 #remove {
   border-top-left-radius: 0px;
-  border-top-right-radius: 5px;
+  border-top-right-radius: 6px;
   border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 5px;
-  border: 0px solid transparent;
-  background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-    stop:0   %light,
-    stop:0.4 %light,
-    stop:0.6 %dark,
-    stop:1   %dark);
-
+  border-bottom-right-radius: 6px;
+  border: none;
+  background-color: #333333;
   margin-left: 5px;
-  padding: 0px 5px;
+  padding: 2px 6px;
+  color: #cccccc;
 }
 
 #remove:hover {
-  background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-    stop:0   %light2,
-    stop:0.4 %light2,
-    stop:0.6 %base,
-    stop:1   %base);
-  border: 0px solid transparent;
+  background-color: #444444;
+  border: none;
 }
 
 #remove:pressed {
-  background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-    stop:0   %base,
-    stop:0.4 %base,
-    stop:0.6 %light2,
-    stop:1   %light2);
-  border: 0px solid transparent;
+  background-color: #2a2a2a;
+  border: none;
 }
-
